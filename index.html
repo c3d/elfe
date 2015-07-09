@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>ELIoT by c3d</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>ELIoT</h1>
+          <h2>Extensible Language for the Internet of Things</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/c3d/eliot/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/c3d/eliot/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/c3d/eliot" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="eliot" class="anchor" href="#eliot" aria-hidden="true"><span class="octicon octicon-link"></span></a>ELIoT</h1>
+
+<h3>
+<a id="extensible-language-for-the-internet-of-things" class="anchor" href="#extensible-language-for-the-internet-of-things" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extensible Language for the Internet of Things</h3>
+
+<p>ELIoT is a very simple and small programming language specifcally
+designed to facilitate the configuration and control of swarms of
+small devices such as sensors or actuators. It can also be used as a
+powerful, remotely-accessible extension language for larger
+applications.</p>
+
+<h2>
+<a id="example-measuring-temperature" class="anchor" href="#example-measuring-temperature" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: Measuring temperature</h2>
+
+<p>Consider a sensor named <code>sensor.corp.net</code> running ELIoT and featuring
+a temperature measurement through a <code>temperature</code> function.</p>
+
+<p>ELIoT lets you evaluate programss on this sensor remotely to do all
+kind of interesting temperature measurements. By deferring
+computations to the sensor, we minimize network traffic and energy
+consumption. Examples similar to the ones below can be found in the
+<a href="https://github.com/c3d/eliot/tree/master/demo">demo directory</a>.</p>
+
+<h3>
+<a id="simple-temperature-measurement-polling" class="anchor" href="#simple-temperature-measurement-polling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Simple temperature measurement (polling)</h3>
+
+<p>To measure the temperature on a remote node called "sensor.corp.net",
+use the following code:</p>
+
+<pre><code>temperature_on_sensor -&gt; ask "sensor.corp.net", { temperature }
+writeln "Temperature is ", temperature_on_sensor
+</code></pre>
+
+<p>The <code>-&gt;</code> rewrite operator reads "transforms into" and is used in ELIoT
+to define variables, functions, macros, and so on. Look into
+<a href="https://github.com/c3d/eliot/blob/master/src/builtins.eliot">builtins.eliot</a>
+for examples of its use.</p>
+
+<p>The <code>ask</code> function sends a program on a remote node, waits for its
+completion, and returns the result. So each time we call
+<code>temperature_on_sensor</code>, we send a program containing <code>temperature</code> on
+the remote node called <code>sensor.corp.net</code>, and wait for the measured
+value.</p>
+
+<h3>
+<a id="reporting-sudden-changes-in-temperatures" class="anchor" href="#reporting-sudden-changes-in-temperatures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reporting sudden changes in temperatures</h3>
+
+<p>An application may be interested in sudden changes in temperatures,
+e.g. if the sensor suddenly warms up. With ELIoT, without changing
+anything to the temperature API, you can check the temperature every
+second and report if it changed by more than 1 degree since last time
+it was measured with the following program:</p>
+
+<pre><code>invoke "sensor.corp.net",
+    last_temperature := temperature
+    every 1s,
+        check_temperature temperature
+    check_temperature T:real -&gt;
+        writeln "Measuring temperature ", T, " from process ", process_id
+        if abs(T - last_temperature) &gt;= 1.0 then
+            reply
+                temperature_changed T, last_temperature
+        last_temperature := T
+temperature_changed new_temp, last_temp -&gt;
+    writeln "Temperature changed from ", last_temp, " to ", new_temp
+</code></pre>
+
+<p>The <code>invoke</code> function sends a program to the remote node and opens a
+bi-directional connexion, which allows the sensor to <code>reply</code> when it
+feels it has useful data to report. In that case, the sensor replies
+with a call to <code>temperature_changed</code>, sending back the old and new
+temperature, and the controlling node can display a message using
+<code>writeln</code>.</p>
+
+<h3>
+<a id="reporting-changes-in-temperatures-since-last-report" class="anchor" href="#reporting-changes-in-temperatures-since-last-report" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reporting changes in temperatures since last report</h3>
+
+<p>Another application may be interested in how temperature changes over
+time, even if it's gradual. In that case, you want to report
+temperature if it changes by more than one degree since last time it
+was <em>reported</em> (instead of measured). You can do that with a slight
+variation in the code above, so that you update <code>last_temperature</code>
+only after having transmitted the new value, not after having measured it:</p>
+
+<pre><code>invoke "sensor.corp.net",
+    last_temperature := temperature
+    every 1s,
+        check_temperature temperature
+    check_temperature T:real -&gt;
+        writeln "Measuring temperature ", T, " from process ", process_id
+        if abs(T - last_temperature) &gt;= 1.0 then
+            reply
+                temperature_changed T, last_temperature
+            last_temperature := T
+temperature_changed new_temp, last_temp -&gt;
+    writeln "Temperature changed from ", last_temp, " to ", new_temp
+</code></pre>
+
+<p>In ELIoT, indentation is significant, and defined "blocks" of
+code. Other ways to delimit a block of code include brackets
+<code>{ code }</code> (which we used in the first example for <code>{ temperature }</code>,
+as well as parentheses <code>( code )</code> or square brackets <code>[ code ]</code>. The
+latter two are used for expressions.</p>
+
+<h3>
+<a id="computing-average-min-and-max-temperatures" class="anchor" href="#computing-average-min-and-max-temperatures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Computing average, min and max temperatures</h3>
+
+<p>Again using the same sensor, and again without any code or API change
+on the sensor, you can also have it compute min, max and average
+temperatures from samples taken every 2.5 seconds:</p>
+
+<pre><code>invoke "sensor.corp.net",
+    min   -&gt; 100.0
+    max   -&gt; 0.0
+    sum   -&gt; 0.0
+    count -&gt; 0
+
+    compute_stats T:real -&gt;
+        min   := min(T, min)
+        max   := max(T, max)
+        sum   := sum + T
+        count := count + 1
+        reply
+            report_stats count, T, min, max, sum/count
+
+    every 2.5s,
+        compute_stats temperature
+
+report_stats Count, T, Min, Max, Avg -&gt;
+    writeln "Sample ", Count, " T=", T,
+            " Min=", Min, " Max=", Max, " Avg=", Avg
+</code></pre>
+
+<p>Notice how the first parameter of <code>compute_stats</code>, <code>T</code>, has a type
+declaration <code>T:real</code>. This tells ELIoT that a <code>real</code> value is expected
+here. But it also forces ELIoT to actually compute the value, in order
+to check that it is indeed a real number.</p>
+
+<p>As a result, <code>temperature</code> is evaluated only once (to bind it to
+<code>T</code>). If we had done the computation by replacing <code>T</code> with
+<code>temperature</code>, we might have gotten inconsistent readings between two
+subsequent evaluations of <code>temperature</code>, yielding possibly incorrect
+results.</p>
+
+<h3>
+<a id="computing-the-difference-between-two-sensors" class="anchor" href="#computing-the-difference-between-two-sensors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Computing the difference between two sensors</h3>
+
+<p>Imagine now that you have two temperature sensors called
+<code>sensor1.corp.net</code> and <code>sensor2.corp.net</code>, located in Sydney,
+Australia, while your controlling application is located in Sydney,
+Canada. If you need the difference in temperature between the two
+sensors, wouldn't it make sense to minimize the traffic between Canada
+and Australia, and have the two sensors talk to one another locally in
+Australia?</p>
+
+<p>This is very easy with ELIoT. The following program will only send a
+traffic across the ocean if the temperature between the two sensors
+differs by more than 2 degrees, otherwise all network traffic will
+remain local:</p>
+
+<pre><code>invoke "sensor2.corp.net",
+   every 1.1s,
+        sensor1_temp -&gt;
+            ask "sensor1.corp.net",
+                temperature
+        send_temps sensor1_temp, temperature
+
+   send_temps T1:real, T2:real -&gt;
+       if abs(T1-T2) &gt; 2.0 then
+           reply
+               show_temps T1, T2
+
+show_temps T1:real, T2:real -&gt;
+    write "Temperature on sensor1 is ", T1, " and on sensor2 ", T2, ". "
+    if T1&gt;T2 then
+        writeln "Sensor1 is hotter by ", T1-T2, " degrees"
+    else
+        writeln "Sensor2 is hotter by ", T2-T1, " degrees"
+</code></pre>
+
+<p>This program looks and behaves like a single program, but will
+actually be executing on three different machines that may possibly
+located hundreds of miles from one another.</p>
+
+<h3>
+<a id="a-very-powerful-yet-simple-api" class="anchor" href="#a-very-powerful-yet-simple-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>A very powerful, yet simple API</h3>
+
+<p>With these examples, we have demonstrated that using ELIoT, we can
+answer queries from applications that have very different requirements.
+An application will get exactly the data it needs, when it needs it,
+minimizing network traffic and optimizing energy utiliation.</p>
+
+<p>Yet the API on the sensors and on the controlling computer is
+extremely simple. On the sensor, we only have a single function
+returning the temperature. And on the controlling computer, we have a
+single language that deals with data collection, timing, exchange
+between nodes, computations, and more.</p>
+
+<h2>
+<a id="how-do-we-measure-the-temperature" class="anchor" href="#how-do-we-measure-the-temperature" aria-hidden="true"><span class="octicon octicon-link"></span></a>How do we measure the temperature?</h2>
+
+<p>It is very simple to add your own functions to ELIoT, and to call any
+C or C++ function of your choosing. The <code>temperature</code> function is
+implemented in a file called
+<a href="https://github.com/c3d/eliot/blob/master/src/temperature.tbl">temperature.tbl</a>.
+It looks like this:</p>
+
+<pre><code>NAME_FN(Temperature,            // Unique internal name
+        real,                   // Return value
+        "temperature",          // Name for ELIOT programmers
+
+        // C++ code to compute the temperature and return it
+        std::ifstream is("/sys/class/thermal/thermal_zone0/temp");
+        int tval;
+        is &gt;&gt; tval;
+        R_REAL(tval * 0.001));
+</code></pre>
+
+<p>In that code, we read core temperature data as reported by Linux on
+Raspberry Pi by reading the system file <code>/sys/class/thermal/thermal_zone0/temp</code>.
+This file returns values in 1/1000th of a Celsius, so we multiply the
+value we read by 0.001 to get the actual temperature.</p>
+
+<p>To add the <code>temperature</code> module to ELIoT, we just need to add it to
+the list of modules in the
+<a href="https://github.com/c3d/eliot/blob/master/src/Makefile#L32">Makefile</a>:</p>
+
+<pre><code># List of modules to build
+MODULES=basics io math text remote time-functions temperature
+</code></pre>
+
+<p>This will build at least <code>temperature.tbl</code>. That file contains the
+interface between ELIoT and your code. In simple cases like our
+temperature measurement, it may be sufficient. However, if you have
+files called <code>temperature.h</code> or <code>temperature.cpp</code>, they will be
+integrated in your <code>temperature</code> module. This lets you add supporting
+classes or functions.</p>
+
+<p>The <code>tell</code>, <code>ask</code>, <code>invoke</code> and <code>reply</code> words are implemented in the
+module called <code>remote</code>, which consists of
+<a href="https://github.com/c3d/eliot/blob/master/src/remote.tbl">remote.tbl</a>,
+<a href="https://github.com/c3d/eliot/blob/master/src/remote.h">remote.h</a> and
+<a href="https://github.com/c3d/eliot/blob/master/src/remote.cpp">remote.cpp</a>.
+This may not be the easiest module to study, however. You may find
+<a href="https://github.com/c3d/eliot/blob/master/src/io.tbl">io.tbl</a> easier
+to understand.</p>
+
+<h2>
+<a id="compiling-eliot" class="anchor" href="#compiling-eliot" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compiling ELIoT</h2>
+
+<p>To build ELIoT, just use <code>make</code>. On a Raspberry Pi, a <code>make -j3</code>
+should run in about 10 minutes if you start from scratch. On a version
+2, it's about one minute. On a modern PC, it's may be as low as 3 to 5
+seconds. If <code>make</code> works (and it should), then use <code>sudo make install</code>
+to install the target. In summary:</p>
+
+<pre><code>  % make
+  % sudo make install
+</code></pre>
+
+<p>The default location is <code>/usr/local/bin/eliot</code>, but you can install in
+<code>/opt/local/</code> for example by building with <code>make PREFIX=/opt/local/</code>.
+Don't forget the trailing <code>/</code>.</p>
+
+<p>If you are paranoid, you can, from the top-level, run <code>make check</code> to
+validate that your installation is running correctly. It is possible
+for a test named <code>04-basic-operators-in-function</code> to fail on some
+machines, because C arithmetic for <code>&lt;&lt;</code> and <code>&gt;&gt;</code> operators is not
+portable. I will fix that one day. If other tests fail, look into
+file <code>tests/failures-default.out</code> for details of what went wrong.</p>
+
+<h3>
+<a id="running-an-eliot-server" class="anchor" href="#running-an-eliot-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running an ELIoT server</h3>
+
+<p>To start an ELIoT server on a node, simply run <code>eliot -l</code>.</p>
+
+<pre><code>pi% eliot -l
+</code></pre>
+
+<p>By default, ELIoT listens on port 1205. You can change that by using
+the <code>-listen</code> option:</p>
+
+<pre><code>pi% eliot -listen 42105
+</code></pre>
+
+<p>Now, let's try a first test program. On <code>boss</code>, edit a file called
+<code>hello.eliot</code>, and write into it the following code:</p>
+
+<pre><code>tell "pi",
+    writeln "Hello World"
+</code></pre>
+
+<p>Replace <code>"pi"</code> with the actual Internet name of your target
+machine. Then execute that little program with:</p>
+
+<pre><code>boss% eliot hello.eliot
+</code></pre>
+
+<p>Normally, the console output on <code>pi</code> should now look like this:</p>
+
+<pre><code>pi% eliot -l
+Hello World
+</code></pre>
+
+<p>What happens behind the scene is that ELIoT on <code>boss</code> sent the program
+given as an argument to <code>tell</code> to the machine named <code>pi</code> (which must
+be running an ELIoT in listen mode, i.e. have <code>eliot -l</code>
+running). Then, that program executes on the slave. The <code>tell</code> command
+is totally asynchronous, it does not wait for completion on the target.</p>
+
+<p>If this example does not work as intended, and if no obvious error
+appears on the console of either system, you can debug things by
+adding <code>-tremote</code> (<code>-t</code> stands for "trace", and enables specific debug
+traces, in that case any code conditioned by <code>IFTRACE(remote)</code> in the
+ELioT source code).</p>
+
+<h3>
+<a id="the-magic-behind-the-scene" class="anchor" href="#the-magic-behind-the-scene" aria-hidden="true"><span class="octicon octicon-link"></span></a>The magic behind the scene</h3>
+
+<p>There are three key functions to send programs across nodes:</p>
+
+<ul>
+<li>
+<code>tell</code> sends a program asynchronously</li>
+<li>
+<code>ask</code> sends a program synchronously and waits for the result</li>
+<li>
+<code>invoke</code> sends a program and opens a bi-directional channel.
+The node can then use <code>reply</code> to execute code back in the caller's
+program</li>
+</ul>
+
+<p>ELIoT sends not just the program segments you give it, but also the
+necessary data, notably the symbols required for correct evaluation. 
+This is the reason why things appear to work as a single program.</p>
+
+<h2>
+<a id="basics-of-eliot-syntax-and-semantics" class="anchor" href="#basics-of-eliot-syntax-and-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basics of ELIoT syntax and semantics</h2>
+
+<p>ELIoT derives from <a href="http://xlr.sourceforge.net">XLR</a>. It is a
+specially trimmed-down version that does not require LLVM and can work
+in full interpreted mode, making it easier to compiler and use, but
+also safer, since you cannot call arbitrary C functions.</p>
+
+<h3>
+<a id="semantics-one-operator-to-rule-them-all" class="anchor" href="#semantics-one-operator-to-rule-them-all" aria-hidden="true"><span class="octicon octicon-link"></span></a>Semantics: One operator to rule them all</h3>
+
+<p>ELIoT has one fundamental operator, <code>-&gt;</code>, the "rewrite operator",
+which reads as <em>transforms into</em>. It is used to declare variables:</p>
+
+<pre><code>X -&gt; 0
+</code></pre>
+
+<p>It can be used to declare functions:</p>
+
+<pre><code>add_one X -&gt; X + 1
+</code></pre>
+
+<p>The rewrite operator  can be used to declare other operators:</p>
+
+<pre><code>X + Y -&gt; writeln "Adding ", X, " and ", Y; X - (-Y)
+</code></pre>
+
+<p>But it is a more general tool than the operator overloading found in
+most other languages, in particular since it allows you to easily
+overload combinations of operators, or special cases:</p>
+
+<pre><code>A in B..C -&gt; A &gt;= B and A &lt;= C
+X * 1 -&gt; X
+</code></pre>
+
+<p>Rewrites are considered in program order, and pattern matching finds
+the first one that applies. For example, factorial is defined as follows:</p>
+
+<pre><code>0! -&gt; 1
+N! -&gt; N * (N-1)!
+</code></pre>
+
+<p>Many basic program structures are defined that way in
+<a href="https://github.com/c3d/eliot/blob/master/src/builtins.eliot">builtins.eliot</a>.
+For example, if-then-else and infinite loops are defined as follows:</p>
+
+<pre><code>if true  then X else Y      -&gt; X
+if false then X else Y      -&gt; Y
+loop Body                   -&gt; Body; loop Body
+</code></pre>
+
+<h3>
+<a id="syntax-look-ma-no-keywords" class="anchor" href="#syntax-look-ma-no-keywords" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syntax: Look, Ma, no keywords!</h3>
+
+<p>ELIoT has no keywords. Instead, the syntax relies on a rather simple
+<a href="https://en.wikipedia.org/wiki/Recursive_descent_parser">recursive descent</a>
+<a href="https://github.com/c3d/eliot/blob/master/src/parser.cpp">parser</a>.</p>
+
+<p>The parser has no keywords, and generates a parse tree made of * node
+types. The first four node types are leaf nodes:</p>
+
+<ul>
+<li>
+<code>Integer</code> is for integer numbers such as <code>2</code> or <code>16#FFFF_FFFF</code>.</li>
+<li>
+<code>Real</code> is for real numbers such as <code>2.5</code> or <code>2#1.001_001_001#e-3</code>
+</li>
+<li>
+<code>Text</code> is for text values such as <code>"Hello" or</code>'World'`. Text can
+be encoded using UTF-8</li>
+<li>
+<code>Name</code> is for names and symbols such as <code>ABC</code> or <code>**</code>
+</li>
+</ul>
+
+<p>The last four node types are inner nodes:</p>
+
+<ul>
+<li>
+<code>Infix</code> are nodes where a named operator separates the operands,
+e.g. <code>A+B</code> or <code>A and B</code>.</li>
+<li>
+<code>Prefix</code> are nodes where the operator precedes the operand, e.g.
+<code>+X</code> or <code>sin X</code>. By default, functions are prefix.</li>
+<li>
+<code>Postfix</code> are nodes where the operator follows the operand, e.g.
+<code>3%</code> or <code>5km</code>.</li>
+<li>
+<code>Block</code> are nodes with only one child surrounded by delimiters,
+such as <code>(A)</code>, <code>[A]</code> or <code>{A}</code>.</li>
+</ul>
+
+<p>Of note, the line separator is an infix that separates statements,
+much like the semi-colon <code>;</code>. The comma <code>,</code> infix is traditionally
+used to build lists or to separate the argument of
+functions. Indentation forms a special kind of block.</p>
+
+<p>For example, the following code:</p>
+
+<pre><code>tell "foo",
+    if A &lt; B+C then
+        hello
+    world
+</code></pre>
+
+<p>parses as a prefix <code>tell</code>, with an infix <code>,</code> as its right argument. On
+the left of the <code>,</code> there is the text <code>"foo"</code>. On the right, there is
+an indentation block with a child that is an infix line separator. On
+the left of the line separator is the <code>if</code> statement. On the right is
+the name <code>world</code>.</p>
+
+<p>This parser is dynamically configurable, with the default priorities
+being defined by the
+<a href="https://github.com/c3d/eliot/blob/master/src/eliot.syntax">eliot.syntax</a> file.</p>
+
+<p>Parse trees are the fundamendal data structure in ELIoT. Any data or
+program can be represented as a parse tree.</p>
+
+<h3>
+<a id="eliot-as-a-functional-language" class="anchor" href="#eliot-as-a-functional-language" aria-hidden="true"><span class="octicon octicon-link"></span></a>ELIoT as a functional language</h3>
+
+<p>ELIoT can be seen as a functional language, where functions are
+first-class entities, i.e. you can manipulate them, pass them around,
+etc:</p>
+
+<pre><code>adder X:integer -&gt; (Y -&gt; Y + X)
+
+add3 := adder 3
+add5 := adder 5
+
+writeln "3+2=", add3 2
+writeln "5+17=", add5 17
+writeln "8+2=", (adder 8) 2
+</code></pre>
+
+<p>However, it is a bit different in the sense that the core data
+structure is the parse tree. Some specific parse trees, for example
+<code>A+B</code>, are not naturally reduced to a function call, although they are
+subject to the same evaluation rules based on tree rewrites.</p>
+
+<h3>
+<a id="subtlety-1-expression-vs-statement" class="anchor" href="#subtlety-1-expression-vs-statement" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subtlety #1: expression vs. statement</h3>
+
+<p>The ELIoT parse tree is designed to represent programs in a way that
+is relatively natural for human beings. In that sense, it departs from
+languages such as Lisp or SmallTalk.</p>
+
+<p>However, being readable for humans requires a few special rules to
+match the way we read expressions. Consider for example the following:</p>
+
+<pre><code>write sin X, cos Y
+</code></pre>
+
+<p>Most human being parse this as meaning <code>write (sin(X),cos(Y))</code>,
+i.e. we call <code>write</code> with two values resulting from evaluating <code>sin X</code>
+and <code>cos Y</code>. This is not entirely logical. If <code>write</code> takes
+comma-separated arguments, why wouldn't <code>sin</code> also take
+comma-separated arguments? In other words, why doesn't this parse as
+<code>write(sin(X, cos(Y))</code>?</p>
+
+<p>This shows that humans have a notion of <em>expressions</em>
+vs. <em>statements</em>. Expressions such as <code>sin X</code> have higher priority
+than commas and require parentheses if you want multiple arguments. By
+contrast, statements such as <code>write</code> have lower priority, and will
+take comma-separated argument lists. An indent or <code>{ }</code> block begins a
+statement, whereas parentheses <code>()</code> or square brackets <code>[]</code> begin an
+expression.</p>
+
+<p>There are rare cases where the default rule will not achieve the
+desired objective, and you will need additional parentheses.</p>
+
+<h3>
+<a id="subtlety-2-infix-vs-prefix" class="anchor" href="#subtlety-2-infix-vs-prefix" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subtlety #2: infix vs. prefix</h3>
+
+<p>Another special rule is that ELIoT will use the presence of space on
+only one side of an operator to disambiguate between an infix or a
+prefix. For example:</p>
+
+<pre><code>write -A    // write (-A)
+B - A       // (B - A)
+</code></pre>
+
+<h3>
+<a id="subtlety-3-delayed-evaluation" class="anchor" href="#subtlety-3-delayed-evaluation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subtlety #3: Delayed evaluation</h3>
+
+<p>When you pass an argument to a function, evaluation happens only when
+necessary. Deferred evaluation may happen multiple times, which is
+necessary in many cases, but awful for performance if you do it by
+mistake.</p>
+
+<p>Consider the following definition of <code>every</code>:</p>
+
+<pre><code>every Duration, Body -&gt;
+    loop
+        Body
+        sleep Duration
+</code></pre>
+
+<p>In that case, we want the <code>Body</code> to be evaluated every iteration,
+since this is typically an operation that we want to execute at each
+loop. Is the same true for <code>Duration</code>?</p>
+
+<p>One way to force evaluation is to give a type to the argument. If you
+want to force early evaluation of the argument, and to check that it
+is a real value, you can do it as follows:</p>
+
+<pre><code>every Duration:real, Body -&gt;
+    loop
+        Body
+        sleep Duration
+</code></pre>
+
+<h3>
+<a id="subtlelty-4-closures-and-remote-transport" class="anchor" href="#subtlelty-4-closures-and-remote-transport" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subtlelty #4: Closures and remote transport</h3>
+
+<p>Like many functional languages, ELIoT ensures that the value of
+variables is preserved for the evaluation of a given body. Consider
+for example:</p>
+
+<pre><code>adder X:integer -&gt; (Y -&gt; Y + X)
+add3 := adder 3
+</code></pre>
+
+<p>In that case, <code>adder 3</code> will bind <code>X</code> to value <code>3</code>, but then the
+returned value outlives the scope where <code>X</code> was declared. However, <code>X</code>
+is referred to in the code. So the returned value is a <em>closure</em> which
+integrates the binding <code>X-&gt;3</code>.</p>
+
+<p>At this point, such closures cannot be sent across a <code>tell</code>, <code>ask</code>,
+<code>invoke</code> or <code>reply</code>. Make sure data that is sent over to a remote node
+has been evaluated before being sent.</p>
+        </section>
+
+        <footer>
+          ELIoT is maintained by <a href="https://github.com/c3d">c3d</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+                  <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-26414664-6");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+      </div>
+    </div>
+  </body>
+</html>
