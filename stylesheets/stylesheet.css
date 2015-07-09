@@ -169,7 +169,7 @@ code, pre {
   margin-bottom: 30px;
   font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal;
   font-size: 14px;
-  color: #222;
+  color: #036;
 }
 
 code {
@@ -187,8 +187,8 @@ pre {
 }
 pre code {
   padding: 0;
-  color: #f2f2f2;
-  background-color: #303030;
+  color: #003;
+  background-color: #fff;
   border: none;
 }
 
@@ -297,7 +297,8 @@ blockquote {
 ul li {
   list-style-position: inside;
   list-style: disc;
-  padding-left: 20px;
+  padding-left: 0px;
+  margin-left: 40px;
 }
 
 ol li {
