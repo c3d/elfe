@@ -14,7 +14,7 @@
     <script src="javascripts/highlight.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 
-    <title>ELIoT by c3d</title>
+    <title>ELFE by c3d</title>
   </head>
 
   <body>
@@ -22,45 +22,48 @@
       <div class="inner">
 
         <header>
-          <img align="right" src="images/ELIoT-Logo-128.png" width="128">
-          <h1>ELIoT</h1>
+          <img align="right" src="images/ELFE-Logo-128.png" width="128">
+          <h1>ELFE</h1>
           <h2>
-            Extensible Language for the Internet of Things
+            Extensible Language for Everyday (and the Internet of Things)
           </h2>
         </header>
 
         <section id="downloads" class="clearfix">
-          <a href="https://github.com/c3d/eliot/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/c3d/eliot/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/c3d/eliot" id="view-on-github" class="button"><span>View on GitHub</span></a>
+          <a href="https://github.com/c3d/elfe/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/c3d/elfe/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/c3d/elfe" id="view-on-github" class="button"><span>View on GitHub</span></a>
         </section>
 
         <hr>
 
         <section id="main_content">
           <h1>
-<a id="eliot" class="anchor" href="#eliot" aria-hidden="true"><span class="octicon octicon-link"></span></a>ELIoT</h1>
+<a id="elfe" class="anchor" href="#elfe" aria-hidden="true"><span class="octicon octicon-link"></span></a>ELFE</h1>
 
 <h3>
 <a id="extensible-language-for-the-internet-of-things" class="anchor" href="#extensible-language-for-the-internet-of-things" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extensible Language for the Internet of Things</h3>
 
-<p>ELIoT is a very simple and small programming language specifcally
-designed to facilitate the configuration and control of swarms of
-small devices such as sensors or actuators. It can also be used as a
-powerful, remotely-accessible extension language for larger
-applications.</p>
+<p>ELFE is a very simple and small programming language. While it is a
+general-purpose programming language, it is specifcally tuned to
+facilitate the configuration and control of swarms of small devices
+such as sensors or actuators. It can also be used as a powerful,
+remotely-accessible extension language for larger applications.</p>
+
+<p>ELFE used to be called ELiOT, but was renamed following a complaint
+from Legrand that they own the trademark.</p>
 
 <h2>
 <a id="example-measuring-temperature" class="anchor" href="#example-measuring-temperature" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: Measuring temperature</h2>
 
-<p>Consider a sensor named <code>sensor.corp.net</code> running ELIoT and featuring
+<p>Consider a sensor named <code>sensor.corp.net</code> running ELFE and featuring
 a temperature measurement through a <code>temperature</code> function.</p>
 
-<p>ELIoT lets you evaluate programs on this sensor remotely to do all
+<p>ELFE lets you evaluate programs on this sensor remotely to do all
 kinds of interesting temperature measurements. By deferring
 computations to the sensor, we minimize network traffic and energy
 consumption. Examples similar to the ones below can be found in the
-<a href="https://github.com/c3d/eliot/tree/master/demo">demo directory</a>.</p>
+<a href="https://github.com/c3d/elfe/tree/master/demo">demo directory</a>.</p>
 
 <h3>
 <a id="simple-temperature-measurement-polling" class="anchor" href="#simple-temperature-measurement-polling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Simple temperature measurement (polling)</h3>
@@ -72,9 +75,9 @@ use the following code:</p>
 writeln "Temperature is ", temperature_on_sensor
 </code></pre>
 
-<p>The <code>-&gt;</code> rewrite operator reads "transforms into" and is used in ELIoT
+<p>The <code>-&gt;</code> rewrite operator reads "transforms into" and is used in ELFE
 to define variables, functions, macros, and so on. Look into
-<a href="https://github.com/c3d/eliot/blob/master/src/builtins.eliot">builtins.eliot</a>
+<a href="https://github.com/c3d/elfe/blob/master/src/builtins.elfe">builtins.elfe</a>
 for examples of its use.</p>
 
 <p>The <code>ask</code> function sends a program on a remote node, waits for its
@@ -87,7 +90,7 @@ value.</p>
 <a id="reporting-sudden-changes-in-temperatures" class="anchor" href="#reporting-sudden-changes-in-temperatures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reporting sudden changes in temperatures</h3>
 
 <p>An application may be interested in sudden changes in temperatures,
-e.g. if the sensor suddenly warms up. With ELIoT, without changing
+e.g. if the sensor suddenly warms up. With ELFE, without changing
 anything to the temperature API, you can check the temperature every
 second and report if it changed by more than 1 degree since last time
 it was measured with the following program:</p>
@@ -137,7 +140,7 @@ temperature_changed new_temp, last_temp -&gt;
     writeln "Temperature changed from ", last_temp, " to ", new_temp
 </code></pre>
 
-<p>In ELIoT, indentation is significant, and defined "blocks" of
+<p>In ELFE, indentation is significant, and defined "blocks" of
 code. Other ways to delimit a block of code include brackets
   <code>{ code }</code>. This is the notation we used in the first example,
   where we wrote <code>{ temperature }</code>. Blocks also include
@@ -174,8 +177,8 @@ report_stats Count, T, Min, Max, Avg -&gt;
 </code></pre>
 
 <p>Notice how the first parameter of <code>compute_stats</code>, <code>T</code>, has a type
-declaration <code>T:real</code>. This tells ELIoT that a <code>real</code> value is expected
-here. But it also forces ELIoT to actually compute the value, in order
+declaration <code>T:real</code>. This tells ELFE that a <code>real</code> value is expected
+here. But it also forces ELFE to actually compute the value, in order
 to check that it is indeed a real number.</p>
 
 <p>As a result, <code>temperature</code> is evaluated only once (to bind it to
@@ -195,7 +198,7 @@ sensors, wouldn't it make sense to minimize the traffic between Canada
 and Australia, and have the two sensors talk to one another locally in
 Australia?</p>
 
-<p>This is very easy with ELIoT. The following program will only send a
+<p>This is very easy with ELFE. The following program will only send a
 traffic across the ocean if the temperature between the two sensors
 differs by more than 2 degrees, otherwise all network traffic will
 remain local:</p>
@@ -227,7 +230,7 @@ located hundreds of miles from one another.</p>
 <h3>
 <a id="a-very-powerful-yet-simple-api" class="anchor" href="#a-very-powerful-yet-simple-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>A very powerful, yet simple API</h3>
 
-<p>With these examples, we have demonstrated that using ELIoT, we can
+<p>With these examples, we have demonstrated that using ELFE, we can
 answer queries from applications that have very different requirements.
 An application will get exactly the data it needs, when it needs it,
 minimizing network traffic and optimizing energy utilization.</p>
@@ -241,15 +244,15 @@ between nodes, computations, and more.</p>
 <h2>
 <a id="how-do-we-measure-the-temperature" class="anchor" href="#how-do-we-measure-the-temperature" aria-hidden="true"><span class="octicon octicon-link"></span></a>How do we measure the temperature?</h2>
 
-<p>It is very simple to add your own functions to ELIoT, and to call any
+<p>It is very simple to add your own functions to ELFE, and to call any
 C or C++ function of your choosing. The <code>temperature</code> function is
 implemented in a file called
-<a href="https://github.com/c3d/eliot/blob/master/src/temperature.tbl">temperature.tbl</a>.
+<a href="https://github.com/c3d/elfe/blob/master/src/temperature.tbl">temperature.tbl</a>.
 It looks like this:</p>
 
 <pre><code>NAME_FN(Temperature,            // Unique internal name
         real,                   // Return value
-        "temperature",          // Name for ELIOT programmers
+        "temperature",          // Name for ELFE programmers
 
         // C++ code to compute the temperature and return it
         std::ifstream is("/sys/class/thermal/thermal_zone0/temp");
@@ -263,16 +266,16 @@ Raspberry Pi by reading the system file <code>/sys/class/thermal/thermal_zone0/t
 This file returns values in 1/1000th of a Celsius, so we multiply the
 value we read by 0.001 to get the actual temperature.</p>
 
-<p>To add the <code>temperature</code> module to ELIoT, we just need to add it to
+<p>To add the <code>temperature</code> module to ELFE, we just need to add it to
 the list of modules in the
-<a href="https://github.com/c3d/eliot/blob/master/src/Makefile#L32">Makefile</a>:</p>
+<a href="https://github.com/c3d/elfe/blob/master/src/Makefile#L32">Makefile</a>:</p>
 
 <pre><code># List of modules to build
 MODULES=basics io math text remote time-functions temperature
 </code></pre>
 
 <p>This will build at least <code>temperature.tbl</code>. That file contains the
-interface between ELIoT and your code. In simple cases like our
+interface between ELFE and your code. In simple cases like our
 temperature measurement, it may be sufficient. However, if you have
 files called <code>temperature.h</code> or <code>temperature.cpp</code>, they will be
 integrated in your <code>temperature</code> module. This lets you add supporting
@@ -280,17 +283,17 @@ classes or functions.</p>
 
 <p>The <code>tell</code>, <code>ask</code>, <code>invoke</code> and <code>reply</code> words are implemented in the
 module called <code>remote</code>, which consists of
-<a href="https://github.com/c3d/eliot/blob/master/src/remote.tbl">remote.tbl</a>,
-<a href="https://github.com/c3d/eliot/blob/master/src/remote.h">remote.h</a> and
-<a href="https://github.com/c3d/eliot/blob/master/src/remote.cpp">remote.cpp</a>.
+<a href="https://github.com/c3d/elfe/blob/master/src/remote.tbl">remote.tbl</a>,
+<a href="https://github.com/c3d/elfe/blob/master/src/remote.h">remote.h</a> and
+<a href="https://github.com/c3d/elfe/blob/master/src/remote.cpp">remote.cpp</a>.
 This may not be the easiest module to study, however. You may find
-<a href="https://github.com/c3d/eliot/blob/master/src/io.tbl">io.tbl</a> easier
+<a href="https://github.com/c3d/elfe/blob/master/src/io.tbl">io.tbl</a> easier
 to understand.</p>
 
 <h2>
-<a id="compiling-eliot" class="anchor" href="#compiling-eliot" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compiling ELIoT</h2>
+<a id="compiling-elfe" class="anchor" href="#compiling-elfe" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compiling ELFE</h2>
 
-<p>To build ELIoT, just use <code>make</code>. On a Raspberry Pi, a <code>make -j3</code>
+<p>To build ELFE, just use <code>make</code>. On a Raspberry Pi, a <code>make -j3</code>
 should run in about 10 minutes if you start from scratch. On a version
 2, it's about one minute. On a modern PC, it's may be as low as 3 to 5
 seconds. If <code>make</code> works (and it should), then use <code>sudo make install</code>
@@ -300,7 +303,7 @@ to install the target. In summary:</p>
   % sudo make install
 </code></pre>
 
-<p>The default location is <code>/usr/local/bin/eliot</code>, but you can install in
+<p>The default location is <code>/usr/local/bin/elfe</code>, but you can install in
 <code>/opt/local/</code> for example by building with <code>make PREFIX=/opt/local/</code>.
 Don't forget the trailing <code>/</code>.</p>
 
@@ -312,21 +315,21 @@ portable. I will fix that one day. If other tests fail, look into
 file <code>tests/failures-default.out</code> for details of what went wrong.</p>
 
 <h3>
-<a id="running-an-eliot-server" class="anchor" href="#running-an-eliot-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running an ELIoT server</h3>
+<a id="running-an-elfe-server" class="anchor" href="#running-an-elfe-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running an ELFE server</h3>
 
-<p>To start an ELIoT server on a node, simply run <code>eliot -l</code>.</p>
+<p>To start an ELFE server on a node, simply run <code>elfe -l</code>.</p>
 
-<pre><code>pi% eliot -l
+<pre><code>pi% elfe -l
 </code></pre>
 
-<p>By default, ELIoT listens on port 1205. You can change that by using
+<p>By default, ELFE listens on port 1205. You can change that by using
 the <code>-listen</code> option:</p>
 
-<pre><code>pi% eliot -listen 42105
+<pre><code>pi% elfe -listen 42105
 </code></pre>
 
 <p>Now, let's try a first test program. On <code>boss</code>, edit a file called
-<code>hello.eliot</code>, and write into it the following code:</p>
+<code>hello.elfe</code>, and write into it the following code:</p>
 
 <pre><code>tell "pi",
     writeln "Hello World"
@@ -335,18 +338,18 @@ the <code>-listen</code> option:</p>
 <p>Replace <code>"pi"</code> with the actual Internet name of your target
 machine. Then execute that little program with:</p>
 
-<pre><code>boss% eliot hello.eliot
+<pre><code>boss% elfe hello.elfe
 </code></pre>
 
 <p>Normally, the console output on <code>pi</code> should now look like this:</p>
 
-<pre><code>pi% eliot -l
+<pre><code>pi% elfe -l
 Hello World
 </code></pre>
 
-<p>What happens behind the scene is that ELIoT on <code>boss</code> sent the program
+<p>What happens behind the scene is that ELFE on <code>boss</code> sent the program
 given as an argument to <code>tell</code> to the machine named <code>pi</code> (which must
-be running an ELIoT in listen mode, i.e. have <code>eliot -l</code>
+be running an ELFE in listen mode, i.e. have <code>elfe -l</code>
 running). Then, that program executes on the slave. The <code>tell</code> command
 is totally asynchronous, it does not wait for completion on the target.</p>
 
@@ -354,7 +357,7 @@ is totally asynchronous, it does not wait for completion on the target.</p>
 appears on the console of either system, you can debug things by
 adding <code>-tremote</code> (<code>-t</code> stands for "trace", and enables specific debug
 traces, in that case any code conditioned by <code>IFTRACE(remote)</code> in the
-ELioT source code).</p>
+Elfe source code).</p>
 
 <h3>
 <a id="the-magic-behind-the-scene" class="anchor" href="#the-magic-behind-the-scene" aria-hidden="true"><span class="octicon octicon-link"></span></a>The magic behind the scene</h3>
@@ -372,14 +375,14 @@ The node can then use <code>reply</code> to execute code back in the caller's
 program</li>
 </ul>
 
-<p>ELIoT sends not just the program segments you give it, but also the
+<p>ELFE sends not just the program segments you give it, but also the
 necessary data, notably the symbols required for correct evaluation. 
 This is the reason why things appear to work as a single program.</p>
 
 <h2>
-<a id="basics-of-eliot-syntax-and-semantics" class="anchor" href="#basics-of-eliot-syntax-and-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basics of ELIoT syntax and semantics</h2>
+<a id="basics-of-elfe-syntax-and-semantics" class="anchor" href="#basics-of-elfe-syntax-and-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basics of ELFE syntax and semantics</h2>
 
-<p>ELIoT derives from <a href="http://xlr.sourceforge.net">XLR</a>. It is a
+<p>ELFE derives from <a href="http://xlr.sourceforge.net">XLR</a>. It is a
 specially trimmed-down version that does not require LLVM and can work
 in full interpreted mode, making it easier to compile and use, but
 also safer, since you cannot call arbitrary C functions.</p>
@@ -387,7 +390,7 @@ also safer, since you cannot call arbitrary C functions.</p>
 <h3>
 <a id="semantics-one-operator-to-rule-them-all" class="anchor" href="#semantics-one-operator-to-rule-them-all" aria-hidden="true"><span class="octicon octicon-link"></span></a>Semantics: One operator to rule them all</h3>
 
-<p>ELIoT has one fundamental operator, <code>-&gt;</code>, the "rewrite operator",
+<p>ELFE has one fundamental operator, <code>-&gt;</code>, the "rewrite operator",
 which reads as <em>transforms into</em>. It is used to declare variables:</p>
 
 <pre><code>X -&gt; 0
@@ -419,7 +422,7 @@ N! -&gt; N * (N-1)!
 </code></pre>
 
 <p>Many basic program structures are defined that way in
-<a href="https://github.com/c3d/eliot/blob/master/src/builtins.eliot">builtins.eliot</a>.
+<a href="https://github.com/c3d/elfe/blob/master/src/builtins.elfe">builtins.elfe</a>.
 For example, if-then-else and infinite loops are defined as follows:</p>
 
 <pre><code>if true  then X else Y      -&gt; X
@@ -430,9 +433,9 @@ loop Body                   -&gt; Body; loop Body
 <h3>
 <a id="syntax-look-ma-no-keywords" class="anchor" href="#syntax-look-ma-no-keywords" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syntax: Look, Ma, no keywords!</h3>
 
-<p>ELIoT has no keywords. Instead, the syntax relies on a rather simple
+<p>ELFE has no keywords. Instead, the syntax relies on a rather simple
 <a href="https://en.wikipedia.org/wiki/Recursive_descent_parser">recursive descent</a>
-<a href="https://github.com/c3d/eliot/blob/master/src/parser.cpp">parser</a>.</p>
+<a href="https://github.com/c3d/elfe/blob/master/src/parser.cpp">parser</a>.</p>
 
 <p>The parser generates a parse tree made of 8 node types. The first four node types are leaf nodes:</p>
 
@@ -488,15 +491,15 @@ the name <code>world</code>.</p>
 
 <p>This parser is dynamically configurable, with the default priorities
 being defined by the
-<a href="https://github.com/c3d/eliot/blob/master/src/eliot.syntax">eliot.syntax</a> file.</p>
+<a href="https://github.com/c3d/elfe/blob/master/src/elfe.syntax">elfe.syntax</a> file.</p>
 
-<p>Parse trees are the fundamendal data structure in ELIoT. Any data or
+<p>Parse trees are the fundamendal data structure in ELFE. Any data or
 program can be represented as a parse tree.</p>
 
 <h3>
-<a id="eliot-as-a-functional-language" class="anchor" href="#eliot-as-a-functional-language" aria-hidden="true"><span class="octicon octicon-link"></span></a>ELIoT as a functional language</h3>
+<a id="elfe-as-a-functional-language" class="anchor" href="#elfe-as-a-functional-language" aria-hidden="true"><span class="octicon octicon-link"></span></a>ELFE as a functional language</h3>
 
-<p>ELIoT can be seen as a functional language, where functions are
+<p>ELFE can be seen as a functional language, where functions are
 first-class entities, i.e. you can manipulate them, pass them around,
 etc:</p>
 
@@ -518,7 +521,7 @@ subject to the same evaluation rules based on tree rewrites.</p>
 <h3>
 <a id="subtlety-1-expression-vs-statement" class="anchor" href="#subtlety-1-expression-vs-statement" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subtlety #1: expression vs. statement</h3>
 
-<p>The ELIoT parse tree is designed to represent programs in a way that
+<p>The ELFE parse tree is designed to represent programs in a way that
 is relatively natural for human beings. In that sense, it departs from
 languages such as Lisp or SmallTalk.</p>
 
@@ -549,7 +552,7 @@ desired objective, and you will need additional parentheses.</p>
 <h3>
 <a id="subtlety-2-infix-vs-prefix" class="anchor" href="#subtlety-2-infix-vs-prefix" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subtlety #2: infix vs. prefix</h3>
 
-<p>Another special rule is that ELIoT will use the presence of space on
+<p>Another special rule is that ELFE will use the presence of space on
 only one side of an operator to disambiguate between an infix or a
 prefix. For example:</p>
 
@@ -590,7 +593,7 @@ is a real value, you can do it as follows:</p>
 <h3>
 <a id="subtlelty-4-closures-and-remote-transport" class="anchor" href="#subtlelty-4-closures-and-remote-transport" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subtlelty #4: Closures and remote transport</h3>
 
-<p>Like many functional languages, ELIoT ensures that the value of
+<p>Like many functional languages, ELFE ensures that the value of
 variables is preserved for the evaluation of a given body. Consider
 for example:</p>
 
@@ -609,7 +612,7 @@ has been evaluated before being sent.</p>
         </section>
 
         <footer>
-          ELIoT is maintained by <a href="https://github.com/c3d">c3d</a><br>
+          ELFE is maintained by <a href="https://github.com/c3d">c3d</a><br>
           This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
         </footer>
 
