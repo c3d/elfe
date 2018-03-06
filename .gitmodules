@@ -4,3 +4,6 @@
 [submodule "recorder"]
 	path = src/recorder
 	url = https://github.com/c3d/recorder.git
+[submodule "llvm"]
+	path = llvm
+	url = https://github.com/llvm-mirror/llvm.git
