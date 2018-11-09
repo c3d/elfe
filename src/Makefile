@@ -1,5 +1,5 @@
 #******************************************************************************
-# Makefile                                                       ELFE project 
+# Makefile                                                       ELFE project
 #******************************************************************************
 #
 #  File Description:
@@ -21,7 +21,7 @@
 #******************************************************************************
 
 # Define where the build files are located (needs the trailing /)
-BUILD=../build/
+MIQ=recorder/make-it-quick/
 
 # Set to 'none' to disable LLVM
 COMPILER=none
@@ -55,7 +55,7 @@ SOURCES     =					\
 	utf8_fileutils.cpp			\
 	winglob.cpp				\
 	recorder/recorder.c			\
-	recorder/recorder.cpp			\
+	recorder/recorder_ring.c		\
 	$(MODULES_SOURCES)			\
 	$(SOURCES_$(COMPILER))
 
@@ -71,13 +71,19 @@ SOURCES_llvm =					\
 
 PRODUCTS=elfe.exe
 
+CONFIG=	sigaction				\
+	<regex.h>				\
+	<sys/mman.h>				\
+	drand48					\
+	libregex
+
 PREFIX_LIB=$(PREFIX)lib/elfe/
 LIB_INSTALL=builtins.elfe elfe.syntax C.syntax *.stylesheet
 
 DEFINES=ELFE_VERSION='"$(git describe --always --tags --dirty=-dirty)"'
 INCLUDES=. includes recorder
 
-include $(BUILD)rules.mk
+include $(MIQ)rules.mk
 
 # Name of 'llvm-config' to use (e.g. llvm-config-2.9)
 LLVM_CONFIG=llvm-config
@@ -97,9 +103,6 @@ LLVM_LDFLAGS_llvm=$(shell $(LLVM_CONFIG) --ldflags) $(LDFLAGS_llvm$(LLVM_VERSION
 # When LLVM is not enabled
 LLVM_FLAGS_none=-DINTERPRETER_ONLY
 
-# For the recorder, we need C++11
-CXX=$(CXX11)
-
 CPPFLAGS+=$(LLVM_FLAGS)  $(CPPFLAGS_llvm$(LLVM_VERSION))
 LDFLAGS=$(LLVM_LIBS) $(LLVM_LDFLAGS) $(MINGW_LIBS_$(BUILDENV))
 CPPFLAGS_llvm31=-Wno-unused-local-typedefs
@@ -112,25 +115,17 @@ MINGW_LIBS_mingw=-lws2_32
 CPPFLAGS+=	-DELFE_BIN='"'$(PREFIX_BIN)'"'	\
 		-DELFE_LIB='"'$(PREFIX_LIB)'"'
 
-test: run-all-elfe-tests
+.tests: run-all-elfe-tests
 run-all-elfe-tests:
 	cd ../tests; ./alltests
-hello: show_$(COMPILER)_version
+.hello: show_$(COMPILER)_version
 show_llvm_version:
 	@$(INFO) "[INFO]" Building with LLVM version $(LLVM_VERSION)
 show_none_version:
 	@$(INFO) "[INFO]" Building in interpreter-only mode
 
-opt_tests opt-tests:
-	cd ../tests;		\
-	./alltests -r O0;	\
-	./alltests -r O1;	\
-	./alltests -r O2;	\
-	./alltests -r O3
-
-
 # Module-related rules
-clean: modules-clean
+.clean: modules-clean
 
 modules-clean:
 	rm -f $(MODULES_SOURCES) $(MODULES_HEADERS)
@@ -146,7 +141,7 @@ ionly-%:
 %_module.h: %.tbl Makefile
 	$(PRINT_GENERATE) ./generate-module-header $* >  $@
 
-$(DEPENDENCIES)	: $(MODULES_HEADERS) recorder/recorder.h recorder/ring.h
+$(MIQ_DEPENDENCIES): $(MODULES_HEADERS) recorder/recorder.h recorder/ring.h
 
-$(BUILD)rules.mk recorder/recorder.cpp recorder/recorder.h:
-	cd .. && git submodule update --init --recursive
+$(MIQ)rules.mk recorder/recorder.cpp recorder/recorder.h:
+	$(PRINT_BUILD) cd .. && git submodule update --init --recursive

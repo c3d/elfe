@@ -1,5 +1,5 @@
 #******************************************************************************
-# Makefile<elfe>                                                  Elfe project 
+# Makefile<elfe>                                                  Elfe project
 #******************************************************************************
 #
 #  File Description:
@@ -14,14 +14,18 @@
 #
 #
 #******************************************************************************
-# (C) 2015 Christophe de Dinechin <christophe@taodyne.com>
-# (C) 2015 Taodyne SAS
+# (C) 2015-2018 Christophe de Dinechin <christophe@dinechin.org>
 #******************************************************************************
 
-all:
+MIQ=make-it-quick/
 
-check:
-	cd tests; ./alltests
+SUBDIRS=src
 
-%:
-	cd src; $(MAKE) $@
+include $(MIQ)rules.mk
+
+.tests: alltests
+alltests: .ALWAYS
+	$(PRINT_TESTS) cd tests; ./alltests
+
+$(MIQ)rules.mk:
+	$(PRINT_BUILD) git submodule update --init --recursive

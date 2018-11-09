@@ -1,6 +1,6 @@
-[submodule "build"]
-	path = build
-	url = https://github.com/c3d/build.git
 [submodule "recorder"]
 	path = src/recorder
 	url = https://github.com/c3d/recorder.git
+[submodule "make-it-quick"]
+	path = make-it-quick
+	url = https://github.com/c3d/make-it-quick

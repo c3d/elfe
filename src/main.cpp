@@ -176,7 +176,7 @@ Main::~Main()
         topLevelErrors.Display();
         topLevelErrors.Clear();
     }
-    
+
     delete reader;
     delete writer;
 }
@@ -195,7 +195,7 @@ int Main::LoadAndRun()
 
     if (!rc && options.listen)
         return elfe_listen(context, options.listen_forks, options.listen);
-    
+
 #ifndef INTERPRETER_ONLY
     compiler->Dump();
 #endif // INTERPRETER_ONLY
@@ -237,7 +237,7 @@ int Main::ParseOptions()
     // Load builtins before the rest (only after parsing options for builtins)
     if (!options.builtins.empty())
         file_names.insert(file_names.begin(), options.builtins);
-    
+
     return false;
 }
 
@@ -584,12 +584,15 @@ ELFE_END
 
 
 #ifndef LIBELFE
+RECORDER_DEFINE(compiler, 32, "Main compiler entry point");
+
+
 int main(int argc, char **argv)
 // ----------------------------------------------------------------------------
 //   Parse the command line and run the compiler phases
 // ----------------------------------------------------------------------------
 {
-    COMPILER("ELFE Compiler version %s starting", ELFE_VERSION);
+    record(compiler, "ELFE Compiler version %s starting", ELFE_VERSION);
 
 #if CONFIG_USE_SBRK
     char *low_water = (char *) sbrk(0);
@@ -607,7 +610,7 @@ int main(int argc, char **argv)
                 long ((char *) malloc(1) - low_water) / 1024);
 #endif
 
-    COMPILER("Compiler exit code %d", rc);
+    record(compiler, "Compiler exit code %d", rc);
 
     if (main.options.dumpRecorder)
         recorder_dump();
