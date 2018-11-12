@@ -23,9 +23,5 @@ SUBDIRS=src
 
 include $(MIQ)rules.mk
 
-.tests: alltests
-alltests: .ALWAYS
-	$(PRINT_TESTS) cd tests; ./alltests
-
 $(MIQ)rules.mk:
 	$(PRINT_BUILD) git submodule update --init --recursive
