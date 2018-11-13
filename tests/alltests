@@ -68,6 +68,7 @@ SUCCESS="$TESTDIR/success-"$RUNTIME".out"
 FAILURE="$TESTDIR/failure-"$RUNTIME".out"
 EXPECTED="$TESTDIR/expected-"$RUNTIME".out"
 BASEFILE="$TESTDIR/baseline-"$RUNTIME".txt"
+ELFE="$ELFE $LIBOPT"
 
 export TESTDIR ELFE SUCCESS FAILURE PASS UPDATE BASELINE
 
@@ -78,7 +79,6 @@ export TESTDIR ELFE SUCCESS FAILURE PASS UPDATE BASELINE
 echo Tests successfully run on $(date) on $HOSTNAME > "$SUCCESS"
 echo Failed tests on $(date) on $HOSTNAME > "$FAILURE"
 echo Expected test failures on $(date) on $HOSTNAME > "$EXPECTED"
-export ELFE
 
 # Clear the baseline if we are updating it
 if [ ! -z "$BASELINE" ]; then
