@@ -128,8 +128,7 @@ SourceFile::~SourceFile()
 //
 // ============================================================================
 
-Main::Main(int inArgc, char **inArgv, text compilerName,
-           text syntaxName, text styleSheetName, text builtinsName)
+Main::Main(int inArgc, char **inArgv)
 // ----------------------------------------------------------------------------
 //   Initialization of the globals
 // ----------------------------------------------------------------------------
@@ -137,22 +136,27 @@ Main::Main(int inArgc, char **inArgv, text compilerName,
       positions(),
       errors(InitMAIN()),
       topLevelErrors(),
-      syntax(syntaxName.c_str()),
       options(inArgc, inArgv),
+      syntax(options.syntax.c_str()),
 #ifndef INTERPRETER_ONLY
       compiler(NULL),
 #endif // INTERPRETER_ONLY
       context(new Context),
-      renderer(std::cout, styleSheetName, syntax),
+      renderer(std::cout, options.stylesheet, syntax),
       reader(NULL), writer(NULL)
 {
     ELFE_INIT_TRACES();
     Options::options = &options;
     Renderer::renderer = &renderer;
     Syntax::syntax = &syntax;
-    MAIN = this;
-    options.builtins = builtinsName;
-    ParseOptions();
+
+    // Initialize the locale
+    if (!setlocale(LC_CTYPE, ""))
+        std::cerr <<
+            "WARNING: Cannot set locale. "
+            "Check LANG, LC_CTYPE, LC_ALL.\n";
+
+    renderer.SelectStyleSheet(options.stylesheet);
 
     // Once all options have been read, enter symbols and setup compiler
 #ifndef INTERPRETER_ONLY
@@ -214,45 +218,16 @@ Errors *Main::InitMAIN()
 }
 
 
-int Main::ParseOptions()
-// ----------------------------------------------------------------------------
-//   Load all files given on the command line and compile them
-// ----------------------------------------------------------------------------
-{
-    text cmd, end = "";
-
-    // Make sure debug function is linked in...
-    if (getenv("SHOW_INITIAL_DEBUG"))
-        debug((Tree *) NULL);
-
-    // Initialize the locale
-    if (!setlocale(LC_CTYPE, ""))
-        std::cerr << "WARNING: Cannot set locale.\n"
-                  << "         Check LANG, LC_CTYPE, LC_ALL.\n";
-
-    // Scan options and build list of files we need to process
-    for (cmd = options.ParseFirst(); cmd != end; cmd = options.ParseNext())
-        file_names.push_back(cmd);
-
-    // Load builtins before the rest (only after parsing options for builtins)
-    if (!options.builtins.empty())
-        file_names.insert(file_names.begin(), options.builtins);
-
-    return false;
-}
-
-
 int Main::LoadFiles()
 // ----------------------------------------------------------------------------
 //   Load all files given on the command line and compile them
 // ----------------------------------------------------------------------------
 {
-    source_names::iterator  file;
     bool hadError = false;
 
     // Loop over files we will process
-    for (file = file_names.begin(); file != file_names.end(); file++)
-        hadError |= LoadFile(*file);
+    for (auto &file : options.files)
+        hadError |= LoadFile(file);
 
     return hadError;
 }
@@ -411,7 +386,6 @@ int Main::Run()
 // ----------------------------------------------------------------------------
 {
     text cmd, end = "";
-    source_names::iterator file;
     bool hadError = false;
 
     // If we only parse or compile, return
@@ -420,9 +394,9 @@ int Main::Run()
 
     // Loop over files we will process
     Tree_p result = elfe_nil;
-    for (file = file_names.begin(); file != file_names.end(); file++)
+    for (auto &file : options.files)
     {
-        SourceFile &sf = files[*file];
+        SourceFile &sf = files[file];
 
         // Evaluate the given tree
         Errors errors;

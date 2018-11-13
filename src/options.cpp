@@ -60,6 +60,18 @@ Options::Options(int argc, char **argv):
     // Store name of the program
     args.push_back(argv[0]);
 
+    // Record singleton
+    options = this;
+
+    // Self-test mode
+    if (args[0][0] == '.')
+    {
+        compiler = argv[0];
+        syntax = "../src/elfe.syntax";
+        stylesheet = "../src/elfe.stylesheet";
+        builtins = "../src/builtins.elfe";
+    }
+
     // Check if some options are given from environment
     if (kstring envopt = getenv("ELFE_OPT"))
     {
@@ -84,6 +96,9 @@ Options::Options(int argc, char **argv):
         record(options, "  Option #%d is '%s'", a, argv[a]);
         args.push_back(argv[a]);
     }
+
+    // Process arguments and extract options vs. files
+    Process();
 }
 
 
@@ -205,22 +220,10 @@ static void PassOptionToLLVM(kstring &command_line)
 }
 
 
-text Options::ParseFirst(bool consumeFile)
+void Options::Process()
 // ----------------------------------------------------------------------------
-//   Start parsing options, return first non-option
+//   Looks for options and files on the command line
 // ----------------------------------------------------------------------------
-{
-    // Parse next option
-    arg = 1;
-    return ParseNext(consumeFile);
-}
-
-
-text Options::ParseNext(bool consumeFiles)
-// ----------------------------------------------------------------------------
-//   Parse the command line, looking for known options, return first unknown
-// ----------------------------------------------------------------------------
-// Note: What we read here should be compatible with GCC parsing
 {
     while (arg < args.size())
     {
@@ -264,16 +267,14 @@ text Options::ParseNext(bool consumeFiles)
         }
         else
         {
-            text fileName = args[arg];
-            if (consumeFiles)
-            {
-                arg++;
-                files.push_back(fileName);
-            }
-            return fileName;
+            text fileName = args[arg++];
+            files.push_back(fileName);
         }
     }
-    return text("");
+
+    // Add builtins file at the beginning if 'nobuiltins' option was not set
+    if (!builtins.empty())
+        files.insert(files.begin(), builtins);
 }
 
 ELFE_END

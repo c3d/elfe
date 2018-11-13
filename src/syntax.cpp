@@ -1,19 +1,19 @@
 // ****************************************************************************
-//  syntax.cpp                      (C) 1992-2009 Christophe de Dinechin (ddd) 
-//                                                               ELFE project 
+//  syntax.cpp                      (C) 1992-2009 Christophe de Dinechin (ddd)
+//                                                               ELFE project
 // ****************************************************************************
-// 
+//
 //   File Description:
-// 
+//
 //     Description of syntax information used to parse ELFE trees
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// 
+//
+//
+//
+//
+//
+//
+//
+//
 // ****************************************************************************
 // This document is released under the GNU General Public License, with the
 // following clarification and exception.
@@ -42,13 +42,14 @@
 #include "scanner.h"
 #include "tree.h"
 #include "errors.h"
+#include "options.h"
 
 ELFE_BEGIN
 
 // ============================================================================
-// 
+//
 //    Syntax used to parse trees
-// 
+//
 // ============================================================================
 
 Syntax *Syntax::syntax = NULL;
@@ -384,10 +385,8 @@ void Syntax::ReadSyntaxFile(Scanner &scanner, uint indents)
                 state = inBlock;
                 break;
             case inSyntaxName:
-                if (txt.find(".syntax") == txt.npos)
-                    txt += ".syntax";
-                if (txt.find("/") == txt.npos)
-                    txt = ELFE_LIB + txt;
+                txt = Options::options->LibPath(txt, ".syntax",
+                                                Options::options->libpath);
                 childSyntax = &subsyntax[txt];
                 if (childSyntax->filename == "")
                 {

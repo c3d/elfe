@@ -80,7 +80,6 @@ struct SourceFile
     bool        readOnly;
 };
 typedef std::map<text, SourceFile> source_files;
-typedef std::vector<text> source_names;
 
 
 struct Main
@@ -88,11 +87,7 @@ struct Main
 //    The main entry point and associated data
 // ----------------------------------------------------------------------------
 {
-    Main(int argc, char **argv,
-         text compiler_name = ELFE_BIN "elfe",
-         text syntax        = ELFE_LIB "elfe.syntax",
-         text style         = ELFE_LIB "elfe.stylesheet",
-         text builtins      = ELFE_LIB "builtins.elfe");
+    Main(int argc, char **argv);
     virtual ~Main();
 
     // Entry point that does everythin
@@ -100,7 +95,6 @@ struct Main
 
     // Individual phases of the above
     Errors *     InitMAIN();
-    int          ParseOptions();
     int          LoadFiles();
     int          LoadFile(text file, text modname="");
     int          Run();
@@ -127,15 +121,16 @@ public:
     Positions    positions;
     Errors *     errors;
     Errors       topLevelErrors;
-    Syntax       syntax;
+
     Options      options;
+
+    Syntax       syntax;
 #ifndef INTERPRETER_ONLY
     Compiler    *compiler;
 #endif // INTERPRETER_ONLY
     Context_p    context;
     Renderer     renderer;
     source_files files;
-    source_names file_names;
     Deserializer *reader;
     Serializer   *writer;
 };

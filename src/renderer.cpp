@@ -135,6 +135,8 @@ void Renderer::SelectStyleSheet(text styleFile, text syntaxFile)
 //   Select an arbitrary style sheet
 // ----------------------------------------------------------------------------
 {
+    if (syntaxFile == "")
+        syntaxFile = Options::options->syntax;
     Syntax defaultSyntax, emptySyntax;
     Positions positions;
     Errors errors;

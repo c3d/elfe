@@ -4,18 +4,18 @@
 //  Christophe de Dinechin                                       ELFE PROJECT
 //  options.h
 // ****************************************************************************
-// 
+//
 //   File Description:
-// 
+//
 //     Processing of ELFE compiler options
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// 
+//
+//
+//
+//
+//
+//
+//
+//
 // ****************************************************************************
 // This document is distributed under the GNU General Public License
 // See the enclosed COPYING file or http://www.gnu.org for information
@@ -39,8 +39,21 @@ struct Options
 {
   public:
     Options(int argc, char **argv);
-    text ParseFirst(bool consumeFile = true);
-    text ParseNext(bool consumeFile = true);
+    void Process();
+    text LibPath(text name, text extension, text base)
+    {
+        if (name.rfind(extension) != name.length() - extension.length())
+            name += extension;
+        if (name.find("/") == name.npos)
+            name = base + name;
+        return name;
+    }
+    text LibRemap(text name, text oldpath, text newpath)
+    {
+        if (name.find(oldpath) == 0)
+            name = name.replace(0, oldpath.length(), newpath);
+        return name;
+    }
 
   public:
     // Read options from the options.tbl file

@@ -55,13 +55,31 @@
 // Getting help on options
 OPTION(h, "List usage information and exit", Usage(args[0].c_str()); exit(0))
 
-// Rendering control
-OPTVAR(stylesheet, text, "elfe")
+// MAIN arguments
+OPTVAR(compiler,        text, ELFE_BIN "elfe")
+OPTVAR(syntax,          text, ELFE_LIB "elfe.syntax")
+OPTVAR(stylesheet,      text, ELFE_LIB "elfe.stylesheet")
+OPTVAR(builtins,        text, ELFE_LIB "bultins.elfe")
+OPTVAR(binpath,         text, ELFE_BIN)
+OPTVAR(libpath,         text, ELFE_LIB)
+
+// Paths for buildins, syntax and stylesheet
+OPTION(compiler, "Path to the compiler",
+       syntax = LibPath(STRING, "", binpath))
+OPTION(syntax, "Select the syntax file",
+       syntax = LibPath(STRING, ".syntax", libpath))
+OPTION(builtins, "Select the builtins file",
+       builtins = LibPath(STRING, ".elfe", libpath))
 OPTION(style, "Select the stylesheet",
-       stylesheet = STRING;
-       if (stylesheet.find("/") == stylesheet.npos)
-           stylesheet = ELFE_LIB + stylesheet;
-       Renderer::renderer->SelectStyleSheet(stylesheet + ".stylesheet"))
+       stylesheet = LibPath(STRING, ".stylesheet", libpath))
+OPTION(libpath, "Select the lib path",
+       text oldpath = libpath;
+       libpath = STRING;
+       syntax = LibRemap(syntax, oldpath, libpath);
+       stylesheet = LibRemap(stylesheet, oldpath, libpath);
+       builtins = LibRemap(builtins, oldpath, libpath);
+    )
+
 
 // Parse only
 OPTVAR(parseOnly, bool, false)
@@ -71,10 +89,6 @@ OPTION(signed, "Parse -1 as a constant, not unary minus prefix",
        signedConstants = true)
 OPTVAR(showSource, bool, false)
 OPTION(show, "Show source file", showSource = true)
-
-// Builtins file
-OPTVAR(builtins, text, "builtins.elfe")
-OPTION(builtins, "Select the builtins file", builtins = STRING)
 
 // Do not load builtins file
 OPTION(nobuiltins, "Do not load builtins", builtins = "")
