@@ -79,7 +79,9 @@ OPTION(libpath, "Select the lib path",
        stylesheet = LibRemap(stylesheet, oldpath, libpath);
        builtins = LibRemap(builtins, oldpath, libpath);
     )
-
+OPTION(show_default_lib_path, "Show the default library path",
+       std::cout << ELFE_LIB;
+       exit(0))
 
 // Parse only
 OPTVAR(parseOnly, bool, false)
