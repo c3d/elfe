@@ -51,7 +51,7 @@ while [ $# -gt 0 ]; do
         -elfe)                  ELFE="$2"; shift ;;
         -install)               LIBPATH="$2"; LIBOPT="-libpath $2"; shift ;;
         -installed)             ELFE="elfe";
-                                LIBPATH="$(elfe -show_default_lib_path)" ;
+                                LIBPATH="$(elfe -show_library_path)" ;
                                 LIBOPT="" ;;
         -r|-runtime)            RUNTIME="$2"; shift ;;
         -i|-interactive)        RUNTIME="O0" ;;
