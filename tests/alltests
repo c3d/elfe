@@ -24,7 +24,9 @@
 OS=$(uname)
 TESTDIR="$(pwd)"
 SUBDIRS="[0-9]*"
-ELFE=elfe
+LIBPATH="../src/"
+LIBOPT="-libpath $LIBPATH"
+ELFE="../elfe"
 PASS="pass"
 ONE_FAILED=
 PATTERN='[A-Za-z0-9]*'
@@ -44,28 +46,23 @@ MISSING_REFERENCE=0
 EXCLUDED=0
 TOTAL_TESTS=0
 
-if [ "$1" == '-elfe' ]; then ELFE="$2"; shift; shift; fi
-if [ "$1" == "-r" -o "$1" == "-runtime" ]; then
-    shift; RUNTIME="$1"; shift;
-fi
-if [ "$1" == "-i" ]; then
-    RUNTIME="O0"
-    shift;
-fi
-if [ "$1" == "-O1" ]; then
-    RUNTIME="O1"
-    shift;
-fi
-if [ "$1" == "-dir" -o "$1" == "-d" ]; then
-    SUBDIRS="$2"; shift; shift;
-fi
-if [ "$1" == "-baseline" -o "$1" == "-b" ]; then
-   shift; BASELINE='*'; PATTERN="$BASELINE";
-fi
-if [ "$1" == "-update" -o "$1" == "-u" ]; then
-   shift; UPDATE='*'$1'*'; PATTERN="$UPDATE"; shift;
-fi
-if [ ! -z "$1" ]; then PATTERN='*'"$1"'*'; shift; fi
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -elfe)                  ELFE="$2"; shift ;;
+        -install)               LIBPATH="$2"; LIBOPT="-libpath $2"; shift ;;
+        -installed)             ELFE="elfe";
+                                LIBPATH="$(elfe -show_default_lib_path)" ;
+                                LIBOPT="" ;;
+        -r|-runtime)            RUNTIME="$2"; shift ;;
+        -i|-interactive)        RUNTIME="O0" ;;
+        -O1|-O2|-O3)            RUNTIME="${1/-/}" ;;
+        -d|-dir)                SUBDIRS="$2"; shift ;;
+        -b|-baseline)           BASELINE='*'; PATTERN="$BASELINE" ;;
+        -u|-update)             UPDATE='*'"$1"'*'; PATTERN="$UPDATE"; ;;
+        *)                      PATTERN='*'"$1"'*' ;;
+    esac
+    shift
+done
 
 SUCCESS="$TESTDIR/success-"$RUNTIME".out"
 FAILURE="$TESTDIR/failure-"$RUNTIME".out"
@@ -127,7 +124,7 @@ do
     eval $(grep TO_REMOVE alltests_$RUNTIME)
     [ -z "$RT_OPT" ] && { eval $(grep RT_OPT alltests_$RUNTIME); }
     if [ -z "$CMD" ]; then
-        CMD="$ELFE $RT_OPT $OPT $TESTNAME";
+        CMD="$ELFE $LIBOPT $RT_OPT $OPT $TESTNAME";
         [ -z "$RUN" ] && { eval $(grep RUN alltests_$RUNTIME); }
     fi
 
@@ -153,8 +150,11 @@ do
                 UNEXPECTED_FAILURES=$(($UNEXPECTED_FAILURES+1))
             fi
         elif [ ! -z "$REF" ]; then
-            sed 's@'$TESTDIR'@TESTS@g' < $LOG > $LOG.tmp && mv $LOG.tmp $LOG
-            sed 's@'library/runtime/$RUNTIME'@library/runtime/default@g' < $LOG > $LOG.tmp && mv $LOG.tmp $LOG
+            sed -e 's@'$TESTDIR'@TESTS@g'                       \
+                -e 's@'library/runtime/$RUNTIME'@RUNTIME@g'     \
+                -e 's@'$LIBPATH'@LIB/@g'                        \
+                < $LOG > $LOG.tmp && mv $LOG.tmp $LOG
+
             if diff $REF $LOG > /dev/null 2>&1; then
                 THIS=ok
             elif diff $REFR $LOG > /dev/null 2>&1; then
