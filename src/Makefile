@@ -142,7 +142,8 @@ ionly-%:
 %_module.h: %.tbl Makefile
 	$(PRINT_GENERATE) ./generate-module-header $* >  $@
 
-$(MIQ_DEPENDENCIES): $(MODULES_HEADERS) recorder/recorder.h recorder/ring.h
+$(MIQ_DEPENDENCIES): 	$(MODULES_HEADERS) 	\
+			recorder/recorder.h recorder/recorder_ring.h
 
-$(MIQ)rules.mk recorder/recorder.cpp recorder/recorder.h:
+$(MIQ)rules.mk recorder/recorder.c recorder/recorder.h:
 	$(PRINT_BUILD) cd .. && git submodule update --init --recursive
