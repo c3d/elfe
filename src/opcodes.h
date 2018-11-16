@@ -131,7 +131,7 @@ public:
         ELFE_ASSERT(next == NULL);
         ELFE_ASSERT(owner == NULL);
     }
-    
+
     virtual void                Delete(){ /* Not owned by the tree */ }
     virtual void                Register(Context *);
     virtual Tree *              Shape() { return NULL; }
@@ -154,6 +154,7 @@ struct NameOpcode : Opcode
     NameOpcode(kstring name, Name_p &toDefine)
         : toDefine(toDefine)
     {
+        Allocator<Name>::CreateSingleton();
         toDefine = new Name(name);
     }
 
@@ -162,7 +163,7 @@ struct NameOpcode : Opcode
         DataResult(data, toDefine);
         return success;
     }
-    
+
     virtual Tree *              Shape() { return toDefine; }
     virtual void                Register(Context *);
     virtual Opcode *            Clone() { return new NameOpcode(*this); }
@@ -492,7 +493,7 @@ ELFE_END
                (void *) (GarbageCollector::CreateSingleton()            \
                          /* Remove warning about unused variable */     \
                          + 0 * sizeof(init_global_allocator));
-             
+
 
 #define INIT_ALLOCATOR(type)                                            \
 /* ------------------------------------------------------------ */      \

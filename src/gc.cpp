@@ -98,7 +98,7 @@ TypeAllocator::TypeAllocator(kstring tn, uint os)
     }
 
     // Use the address of the garbage collector as signature
-    gc = GarbageCollector::GC();
+    gc = GarbageCollector::CreateSingleton();
 
     // Register the allocator with the garbage collector
     gc->Register(this);
