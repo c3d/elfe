@@ -47,15 +47,14 @@ struct Error
     Error (kstring m, Tree *a, Tree *b, Tree *c);
     ~Error() {}
 
-    // Adding arguments to an error message    
-    Error &             Arg(int x)      { return Arg(Integer::value_t(x)); }
-    Error &             Arg(uint x)     { return Arg(Integer::value_t(x)); }
-    Error &             Arg(long x)     { return Arg(Integer::value_t(x)); }
-    Error &             Arg(ulong x)    { return Arg(Integer::value_t(x)); }
+    // Adding arguments to an error message
     Error &             Arg(Integer::value_t value);
     Error &             Arg(Real::value_t value);
     Error &             Arg(Text::value_t t);
     Error &             Arg(Tree *arg);
+    template <typename num,
+              typename = typename std::enable_if<std::is_integral<num>::value>>
+    Error &             Arg(num x) { return Arg(Integer::value_t(x)); }
 
     // Displaying the message
     void                Display();
@@ -64,7 +63,7 @@ struct Error
 
     // Converting to a prefix form for error evaluation
                         operator Tree *();
-    
+
 
 public:
     text                message;
