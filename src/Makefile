@@ -72,10 +72,12 @@ SOURCES_llvm =					\
 PRODUCTS=elfe.exe
 
 CONFIG=	sigaction				\
-	<regex.h>				\
 	<sys/mman.h>				\
+	<regex.h>				\
+	libregex				\
 	drand48					\
-	libregex
+	glob					\
+	uchar ushort uint ulong longlong
 
 PREFIX_LIB=$(PREFIX)lib/elfe/
 LIB_INSTALL=builtins.elfe elfe.syntax C.syntax *.stylesheet

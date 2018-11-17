@@ -47,7 +47,7 @@
 #include <stdint.h>
 
 /* Include the configuration file */
-#include "configuration.h"
+#include "config.h"
 
 
 /* ========================================================================= */
@@ -112,34 +112,34 @@
 typedef unsigned char   byte;
 
 
-/* Shortcuts for unsigned numbers - Quite uneasy to figure out in general */
-#if CONFIG_HAS_UCHAR
+/* Shortcuts for unsigned unumbers - Quite uneasy to figure out in general */
+#ifndef HAVE_UCHAR
 typedef unsigned char   uchar;
 #endif
 
-#if CONFIG_HAS_USHORT
+#ifndef HAVE_USHORT
 typedef unsigned short  ushort;
 #endif
 
-#if CONFIG_HAS_UINT
+#ifndef HAVE_UINT
 typedef unsigned int    uint;
 #endif
 
-#if CONFIG_HAS_ULONG
+#ifndef HAVE_ULONG
 typedef unsigned long   ulong;
 #endif
 
 /* The largest available integer type */
-#if CONFIG_HAS_LONGLONG
+#ifdef HAVE_LONGLONG
 typedef long long          longlong;
 typedef unsigned long long ulonglong;
-#elif CONFIG_HAS_INT64
+#elif HAVE_INT64
 typedef __int64          longlong;
 typedef unsigned __int64 ulonglong;
 #else
 typedef long            longlong;
 typedef unsigned long   ulonglong;
-#endif
+#endif /* LONGLONG or INT64 */
 
 /* Sized integers (dependent on the compiler...) - Only when needed */
 typedef int8_t          int8;
@@ -198,9 +198,9 @@ externc void elfe_assert_failed(kstring msg, kstring file, uint line);
 
 
 // ============================================================================
-// 
+//
 //   Tracing information
-// 
+//
 // ============================================================================
 
 #ifdef ELFE_DEBUG
@@ -234,13 +234,8 @@ externc void elfe_assert_failed(kstring msg, kstring file, uint line);
 /*                                                                           */
 /* ========================================================================= */
 
-#if CONFIG_HAS_NAMESPACE
 #define ELFE_BEGIN                namespace ELFE {
 #define ELFE_END                  }
-#else   /* !CONFIG_HAS_NAMESPACE */
-#define ELFE_BEGIN
-#define ELFE_END
-#endif  /* ?CONFIG_HAS_NAMESPACE */
 
 
 #endif /* ELEMENTALS_H */

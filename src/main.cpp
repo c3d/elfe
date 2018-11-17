@@ -38,7 +38,6 @@
 //  (C) 2010 Taodyne SAS
 // ****************************************************************************
 
-#include "configuration.h"
 #include "tree-clone.h"
 #include "main.h"
 #include "scanner.h"
@@ -75,12 +74,13 @@
 #include <sys/stat.h>
 
 
+RECORDER_DEFINE(compiler, 32, "Main compiler entry point");
+
 ELFE_DEFINE_TRACES
 
 ELFE_BEGIN
 
 Main *MAIN = NULL;
-
 
 
 // ============================================================================
@@ -204,6 +204,7 @@ int Main::LoadAndRun()
     compiler->Dump();
 #endif // INTERPRETER_ONLY
 
+    record(compiler, "LoadAndRun returns %d", rc);
     return rc;
 }
 
@@ -227,7 +228,12 @@ int Main::LoadFiles()
 
     // Loop over files we will process
     for (auto &file : options.files)
-        hadError |= LoadFile(file);
+    {
+        int rc = LoadFile(file);
+        hadError |= rc;
+        record(compiler, "Load file %s code %d, errors %d",
+               file.c_str(), rc, hadError);
+    }
 
     return hadError;
 }
@@ -558,9 +564,6 @@ ELFE_END
 
 
 #ifndef LIBELFE
-RECORDER_DEFINE(compiler, 32, "Main compiler entry point");
-
-
 int main(int argc, char **argv)
 // ----------------------------------------------------------------------------
 //   Parse the command line and run the compiler phases
