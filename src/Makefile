@@ -74,6 +74,7 @@ PRODUCTS=elfe.exe
 CONFIG=	sigaction				\
 	<sys/mman.h>				\
 	<regex.h>				\
+	<windows.h>				\
 	libregex				\
 	drand48					\
 	glob					\
