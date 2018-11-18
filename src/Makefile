@@ -77,6 +77,8 @@ CONFIG=	sigaction				\
 	libregex				\
 	drand48					\
 	glob					\
+	posix_memalign				\
+	mingw_aligned_malloc			\
 	uchar ushort uint ulong longlong
 
 PREFIX_LIB=$(PREFIX)lib/elfe/

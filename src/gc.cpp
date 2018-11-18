@@ -49,9 +49,10 @@
 #include <cstdlib>
 #include <pthread.h>
 
-#ifdef CONFIG_MINGW // Windows: When getting in the way becomes an art form...
+// Windows/MinGW (ancient): When getting in the way becomes an art form...
+#if !defined(HAVE_POSIX_MEMALIGN) && defined(HAVE_MINGW_ALIGNED_MALLOC)
 #include <malloc.h>
-#endif // CONFIG_MINGW
+#endif // HAVE_POSIX_MEMALIGN
 
 
 ELFE_BEGIN
@@ -392,14 +393,21 @@ void *TypeAllocator::operator new(size_t size)
 // ----------------------------------------------------------------------------
 {
     void *result = NULL;
-#ifdef CONFIG_MINGW // Windows. Enough said
+#if defined(HAVE_POSIX_MEMALIGN)
+    // Real operating systems
+    if (posix_memalign(&result, PTR_MASK+1, size))
+        throw std::bad_alloc();
+#elif defined(HAVE_MINGW_ALIGNED_MALLOC)
+    // Ancient versions of MinGW
     result = __mingw_aligned_malloc(size, PTR_MASK+1);
     if (!result)
         throw std::bad_alloc();
-#else // Real operating systems
-    if (posix_memalign(&result, PTR_MASK+1, size))
+#else // don't align
+#warning "Unknown platfom - No alignment"
+    result = malloc(size);
+    if (!result)
         throw std::bad_alloc();
-#endif // WINDOWS or real operating system
+#endif //
     return result;
 }
 
@@ -409,13 +417,16 @@ void TypeAllocator::operator delete(void *ptr)
 //    Matching deallocation
 // ----------------------------------------------------------------------------
 {
-#ifdef CONFIG_MINGW // Aka MS-DOS NT.
-    // Brain damaged?
+#if defined(HAVE_POSIX_MEMALIGN)
+    // Normal system
+    free(ptr);
+#elif defined(HAVE_MINGW_ALIGNED_MALLOC)
+    // Brain damaged OS?
     __mingw_aligned_free(ptr);
-#else // No brain-damage
+#else
+    // Assume limited brain-damage
     free(ptr);
 #endif // WINDOWS vs. rest of the world
-
 }
 
 
