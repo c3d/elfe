@@ -1,7 +1,7 @@
-#ifndef UTF8_IFSTREAM_H
-#define UTF8_IFSTREAM_H
+#ifndef UTF8_FILEUTILS_H
+#define UTF8_FILEUTILS_H
 // ****************************************************************************
-//  utf8_ifstream.h                                              ELFE project
+//  utf8_fileutils.h                                              ELFE project
 // ****************************************************************************
 //
 //   File Description:
@@ -43,7 +43,7 @@
 #include <sys/stat.h>
 
 
-#ifdef CONFIG_MINGW
+#ifdef IMPLEMENT_UTF_STAT
 
 #include <ext/stdio_filebuf.h>
 
@@ -88,7 +88,7 @@ inline bool isDirectorySeparator(int c)
     return c == '/' || c == '\\';
 }
 
-#else
+#else // !IMPLEMENT_UTF_STAT
 
 // Real systems
 typedef struct stat   utf8_filestat_t;
@@ -104,6 +104,6 @@ inline bool isDirectorySeparator(int c)
     return c == '/';
 }
 
-#endif
+#endif // IMPLEMENT_UTF_STAT
 
-#endif // UTF8_FSTREAM_H
+#endif // UTF8_FILEUTILS_H

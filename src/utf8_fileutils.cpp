@@ -19,7 +19,7 @@
 //   See file LICENSE for details.
 // ****************************************************************************
 
-#ifdef CONFIG_MINGW
+#ifdef IMPLEMENT_UTF_STAT
 #include "utf8_fileutils.h"
 
 #include <windows.h>
@@ -111,4 +111,4 @@ int utf8_access(const char *path, int mode)
 }
 
 
-#endif // CONFIG_MINGW
+#endif // IMPLEMENT_UTF_STAT
