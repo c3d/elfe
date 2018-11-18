@@ -1,18 +1,18 @@
 // ****************************************************************************
 //  compiler.cpp                                                  ELFE project
 // ****************************************************************************
-// 
+//
 //   File Description:
-// 
+//
 //    Just-in-time (JIT) compilation of ELFE trees
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// 
+//
+//
+//
+//
+//
+//
+//
+//
 // ****************************************************************************
 // This document is released under the GNU General Public License, with the
 // following clarification and exception.
@@ -61,15 +61,15 @@ ELFE_BEGIN
 
 
 // ============================================================================
-// 
+//
 //    Compiler - Global information about the LLVM compiler
-// 
+//
 // ============================================================================
 //
 // The Compiler class is where we store all the global information that
 // persists during the lifetime of the program: LLVM data structures,
 // LLVM definitions for frequently used types, ELFE runtime functions, ...
-// 
+//
 
 using namespace llvm;
 
@@ -122,12 +122,9 @@ Compiler::Compiler(kstring moduleName, int argc, char **argv)
     for (int arg = 1; arg < argc; arg++)
         if (strncmp(argv[arg], "-llvm", 5) == 0)
             llvmArgv.push_back(argv[arg] + 5);
-        
-    llvm::cl::ParseCommandLineOptions(llvmArgv.size(), &llvmArgv[0]);
 
-#ifdef CONFIG_MINGW
+    llvm::cl::ParseCommandLineOptions(llvmArgv.size(), &llvmArgv[0]);
     llvm::sys::PrintStackTraceOnErrorSignal();
-#endif
     COMPILER("Creating compiler");
 
     // Register a listener with the garbage collector
@@ -198,7 +195,7 @@ Compiler::Compiler(kstring moduleName, int argc, char **argv)
     };
     // If this assert fails, you changed struct tree and need to modify here
     ELFE_CASSERT(sizeof(LocalTree) == sizeof(Tree));
-               
+
     // Create the Tree type
     llvm_types treeElements;
     treeElements.push_back(LLVM_INTTYPE(ulong));           // tag
@@ -382,7 +379,7 @@ static inline void createCompilerFunctionPasses(PassManagerBase *PM)
 {
      PM->add(createInstructionCombiningPass()); // Clean up after IPCP & DAE
      PM->add(createCFGSimplificationPass()); // Clean up after IPCP & DAE
-     
+
     // Start of function pass.
     // Break up aggregate allocas, using SSAUpdater.
 #if LLVM_VERSION < 391
@@ -402,7 +399,7 @@ static inline void createCompilerFunctionPasses(PassManagerBase *PM)
      PM->add(createReassociatePass());           // Reassociate expressions
      PM->add(createLoopRotatePass());            // Rotate Loop
      PM->add(createLICMPass());                  // Hoist loop invariants
-     PM->add(createInstructionCombiningPass());  
+     PM->add(createInstructionCombiningPass());
      PM->add(createIndVarSimplifyPass());        // Canonicalize indvars
      PM->add(createLoopIdiomPass());             // Recognize idioms like memset
      PM->add(createLoopDeletionPass());          // Delete dead loops
@@ -576,7 +573,7 @@ llvm::Function *Compiler::EnterBuiltin(text name,
         builtins[name] = result;
     }
 
-    return result;    
+    return result;
 }
 
 
@@ -875,7 +872,7 @@ llvm_type Compiler::MachineType(Tree *tree)
             return integer32Ty;
         if (tree == real32_type)
             return real32Ty;
-    
+
         // Check special tree types in basics.tbl
         if (tree == symbol_type || tree == name_type || tree == operator_type)
             return nameTreePtrTy;
@@ -1106,11 +1103,11 @@ bool Compiler::FreeResources(Tree *tree)
         if (llvm::Function *f = info->function)
         {
             bool inUse = !f->use_empty();
-            
+
             IFTRACE(llvm)
                 std::cerr << " function F" << f
                           << (inUse ? " in use" : " unused");
-            
+
             if (inUse)
             {
                 // Defer deletion until later
@@ -1123,16 +1120,16 @@ bool Compiler::FreeResources(Tree *tree)
                 info->function = NULL;
             }
         }
-        
+
         // Drop closure function reference if any
         if (llvm::Function *f = info->closure)
         {
             bool inUse = !f->use_empty();
-            
+
             IFTRACE(llvm)
                 std::cerr << " closure F" << f
                           << (inUse ? " in use" : " unused");
-            
+
             if (inUse)
             {
                 // Defer deletion until later
@@ -1146,16 +1143,16 @@ bool Compiler::FreeResources(Tree *tree)
             }
         }
     }
-    
+
     // Drop any global reference
     if (GlobalValue *v = info->global)
     {
         bool inUse = !v->use_empty();
-        
+
         IFTRACE(llvm)
             std::cerr << " global V" << v
                       << (inUse ? " in use" : " unused");
-        
+
         if (inUse)
         {
             // Defer deletion until later
@@ -1180,9 +1177,9 @@ ELFE_END
 
 
 // ============================================================================
-// 
+//
 //    Debug helpers
-// 
+//
 // ============================================================================
 
 void debugm(ELFE::value_map &m)
@@ -1221,4 +1218,3 @@ void debugv(const llvm_type *t)
 {
     llvm::errs() << *t << "\n";
 }
-
