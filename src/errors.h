@@ -30,6 +30,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 ELFE_BEGIN
 
@@ -52,8 +53,8 @@ struct Error
     Error &             Arg(Real::value_t value);
     Error &             Arg(Text::value_t t);
     Error &             Arg(Tree *arg);
-    template <typename num,
-              typename = typename std::enable_if<std::is_integral<num>::value>>
+    template <typename num, typename =
+              typename std::enable_if<std::is_integral<num>::value>::type>
     Error &             Arg(num x) { return Arg(Integer::value_t(x)); }
 
     // Displaying the message
