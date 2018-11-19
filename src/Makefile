@@ -122,7 +122,7 @@ CPPFLAGS+=	-DELFE_BIN='"'$(PREFIX_BIN)'"'	\
 		-DELFE_LIB='"'$(PREFIX_LIB)'"'
 
 .tests: run-all-elfe-tests
-run-all-elfe-tests:
+run-all-elfe-tests: .product
 	cd ../tests; ./alltests
 .hello: show_$(COMPILER)_version
 show_llvm_version:
