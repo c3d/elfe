@@ -73,6 +73,7 @@ PRODUCTS=elfe.exe
 
 CONFIG=	sigaction				\
 	<sys/mman.h>				\
+	<sys/socket.h>				\
 	<regex.h>				\
 	<windows.h>				\
 	libregex				\
