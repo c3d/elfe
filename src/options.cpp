@@ -63,15 +63,6 @@ Options::Options(int argc, char **argv):
     // Record singleton
     options = this;
 
-    // Self-test mode
-    if (args[0][0] == '.')
-    {
-        compiler = argv[0];
-        syntax = "../src/elfe.syntax";
-        stylesheet = "../src/elfe.stylesheet";
-        builtins = "../src/builtins.elfe";
-    }
-
     // Check if some options are given from environment
     if (kstring envopt = getenv("ELFE_OPT"))
     {
