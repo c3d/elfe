@@ -124,7 +124,7 @@ do
     eval $(grep TO_REMOVE alltests_$RUNTIME)
     [ -z "$RT_OPT" ] && { eval $(grep RT_OPT alltests_$RUNTIME); }
     if [ -z "$CMD" ]; then
-        CMD="$ELFE $LIBOPT $RT_OPT $OPT $TESTNAME";
+        CMD="$ELFE $RT_OPT $OPT $TESTNAME";
         [ -z "$RUN" ] && { eval $(grep RUN alltests_$RUNTIME); }
     fi
 
