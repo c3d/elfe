@@ -59,7 +59,7 @@ OPTION(h, "List usage information and exit", Usage(args[0].c_str()); exit(0))
 OPTVAR(compiler,        text, ELFE_BIN "elfe")
 OPTVAR(syntax,          text, ELFE_LIB "elfe.syntax")
 OPTVAR(stylesheet,      text, ELFE_LIB "elfe.stylesheet")
-OPTVAR(builtins,        text, ELFE_LIB "bultins.elfe")
+OPTVAR(builtins,        text, ELFE_LIB "builtins.elfe")
 OPTVAR(binpath,         text, ELFE_BIN)
 OPTVAR(libpath,         text, ELFE_LIB)
 
